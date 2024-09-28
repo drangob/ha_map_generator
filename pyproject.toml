@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "ha-map-generator"
+version = "0.1.0"
+description = ""
+authors = ["Daniel Horbury <daniel.horbury@multiverse.io>"]
+readme = "README.md"
+packages = [{include = "*.py"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.32.3"
+pandas = "^2.2.3"
+folium = "^0.17.0"
+matplotlib = "^3.9.2"
+python-dotenv = "^1.0.1"
+ruff = "^0.6.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
