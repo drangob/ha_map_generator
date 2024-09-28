@@ -16,6 +16,7 @@ It's intended to generate maps from your holidays or road trips.
 - Python 3.10 or higher
 - Poetry for dependency management
 - Access to a Home Assistant instance with location tracking enabled
+- Access to the [Thunderforest API](https://www.thunderforest.com/docs/apikeys/) for it's [Pioneer](https://www.thunderforest.com/maps/pioneer/) map tiles
 
 ## Installation
 
