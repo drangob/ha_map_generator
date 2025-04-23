@@ -37,4 +37,6 @@ It's intended to generate maps from your holidays or road trips.
 ## Usage
 
 Run the script using Poetry and follow the prompts:
-`python location_tracker.py`
+```
+poetry run ha-map-generator
+```
