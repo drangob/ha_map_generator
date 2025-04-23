@@ -2,7 +2,7 @@
 name = "ha-map-generator"
 version = "0.1.0"
 description = ""
-authors = ["Daniel Horbury <daniel.horbury@multiverse.io>"]
+authors = ["drangob <drangob123@gmail.com>"]
 readme = "README.md"
 packages = [{include = "*.py"}]
 
@@ -11,7 +11,6 @@ python = "^3.10"
 requests = "^2.32.3"
 pandas = "^2.2.3"
 folium = "^0.17.0"
-matplotlib = "^3.9.2"
 python-dotenv = "^1.0.1"
 ruff = "^0.6.8"
 

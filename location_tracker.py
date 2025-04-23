@@ -1,8 +1,8 @@
+from typing import List
 import requests
 import pandas as pd
 import folium
 from folium.plugins import AntPath
-
 # Home Assistant API configuration
 from dotenv import load_dotenv
 import os
@@ -25,31 +25,41 @@ def get_location_data(entity_ids: list[str], days: int):
     
     # Make the API request from the start date until now
     end_date = datetime.now().isoformat()
-    response = requests.get(
-        f"{HA_URL}/api/history/period/{start_date}",
-        headers=HA_HEADERS,
-        params={
-            "filter_entity_id": entity_ids,
-            "end_time": end_date
-        }
-    )
+    responses: List[requests.Response] = []
+    for entity_id in entity_ids:
+        response = requests.get(
+            f"{HA_URL}/api/history/period/{start_date}",
+            headers=HA_HEADERS,
+            params={
+                "filter_entity_id": entity_id,
+                "end_time": end_date
+            }
+        )
+        responses.append(response)
     
-    if response.status_code == 200:
-        data = response.json()
-    else:
-        error_message = response.json().get('message', 'No error message provided')
-        raise Exception(f"Failed to fetch data: HTTP {response.status_code}. Error: {error_message}")
+    all_location_data = []
+
+    for response in responses:
+        if response.status_code == 200:
+            data = response.json()
+        else:
+            error_message = response.json().get('message', 'No error message provided')
+            raise Exception(f"Failed to fetch data: HTTP {response.status_code}. Error: {error_message}")
+
+        # Extract location data from the response
+        for state in data[0]:
+            if "latitude" in state["attributes"] and "longitude" in state["attributes"]:
+                all_location_data.append({
+                    "timestamp": state["last_updated"],
+                    "latitude": state["attributes"]["latitude"],
+                    "longitude": state["attributes"]["longitude"]
+                })
+
     
-    # Extract location data from the response
-    location_data = []
-    for state in data[0]:
-        if "latitude" in state["attributes"] and "longitude" in state["attributes"]:
-            location_data.append({
-                "timestamp": state["last_updated"],
-                "latitude": state["attributes"]["latitude"],
-                "longitude": state["attributes"]["longitude"]
-            })
-    return pd.DataFrame(location_data)
+    location_df = pd.DataFrame(all_location_data)
+    location_df.sort_values(by="timestamp", inplace=True)
+
+    return location_df
 
 def create_old_timey_map(df):
     # Create a base map
@@ -104,11 +114,13 @@ def get_device_tracker_entity_ids():
     for i, entity in enumerate(persons, 1):
         print(f"{i}. {entity['entity_id']}")
     
-    selection = int(input("Enter the number of the entity you want to track: ")) - 1
-    selected_person = persons[selection]
+    selection = input("Enter the numbers of the entities you want to track (comma-separated): ")
+    selected_indices = [int(index.strip()) - 1 for index in selection.split(',')]
+
+    selected_persons = [persons[index] for index in selected_indices]
 
     # using the source for now rather than the device_trackers list
-    device_tracker_entity_ids = [selected_person['attributes']['source']]
+    device_tracker_entity_ids = [selected_person['attributes']['source'] for selected_person in selected_persons]
 
     return device_tracker_entity_ids
 
